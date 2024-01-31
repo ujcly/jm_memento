@@ -1,2 +1,1 @@
-.iwd filter=lfs diff=lfs merge=lfs -text
-jm_memento.iwd filter=lfs diff=lfs merge=lfs -text
+iwd/ filter=lfs diff=lfs merge=lfs -text
