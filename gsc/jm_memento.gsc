@@ -34,9 +34,8 @@ main(){
   maps\mp\jm_memento\gallery::main();
   maps\mp\jm_memento\finish_party::main();
 
-  thread initTeleports();
-  thread initFadeTeleports();
-  thread initShowEnterText();
+  initTeleports();
+  initFadeTeleports();
 
   thread enterP1();
   thread enterP2();
@@ -45,16 +44,17 @@ main(){
   thread enterP4B();
   thread enterP4BTele();
   
-  thread initSecretTeleports();
-  thread initBoothTeleports();
+  initSecretTeleports();
+  initBoothTeleports();
 
-  // Spawn cabin
-  thread initSnowStorm();
+  // Spawn & renai
+  initSnowStorm();
 
   // Gaps
-  thread initTrigNice();
+  initTrigNice();
   
   // P1
+  thread initShowEnterP1Text();
   thread initPotatoStart();
   thread initCod1();
   
@@ -65,23 +65,22 @@ main(){
   thread initLeap();
   
   // P3
-  thread initBouncePads();
+  initBouncePads();
 
   // P4
-  thread initTunnel();
+  initTunnel();
+  initMapInfo();
+  initHideQuote();
   thread initBullseye();
   thread enterFinish();
-  thread initHideQuote();
   thread initMoveKappa();
-  thread initMapInfo();
   thread initKanyeTeleport();
   thread initDescendOld();
   thread initCruiseTop();
 
   // Finish
+  initMapPartTeleports();
   thread initEnterGallery();
-  thread initMapPartTeleports();
-  thread initTomis();
   thread initPotatoEnd();
 
   level.historyLoadFunc = ::onHistoryLoad;
@@ -89,8 +88,7 @@ main(){
 }
 
 onHistoryLoad() {
-   // Called when player loads a run from history (JH only)
-  // part triggers: enter_p4_b, enter_p4_a, enter_p3, enter_p2, enter_p1
+  // Called when player loads a run from history (JH only). Triggers are loaded from the previous run, we need to pick the latest.
   if(self hasTrigger("enter_p4_b"))
     self pEnsurePart("p4_b");
   else if(self hasTrigger("enter_p4_a"))
@@ -161,6 +159,8 @@ initDescendOld() {
 }
 
 pDescendOld() {
+  self endon("disconnect");
+
   wait 0.8;
   self iprintln("^3H^7m it's gone");
   wait 2;
@@ -176,7 +176,7 @@ initKanyeTeleport() {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
-      player ensureTrigAdded("tp_kanye");
+      player addTrigger("tp_kanye");
       player thread pKanyeTeleport(target);
     }
     wait 0.1;
@@ -318,40 +318,12 @@ initCod1() {
   }
 }
 
-initTomis() {
-  trig = getent("tomis", "targetname");
-  orig = getent(trig.target, "targetname");
-  while(1) {
-    trig waittill("trigger", player);
-    player tomisCountDown(trig, orig);
-    wait 0.1;
-  }
-
-}
-
-tomisCountDown(trig, orig) {
-  self endon("disconnect");
-  time = 5;
-
-  while(time > 0 && self istouching(trig))
-    {
-        wait 0.05;
-        time -= 0.05;
-    }
- 
-    if(self istouching(trig))
-    {
-        orig playSound("tomis");
-        wait 29;
-    }
-}
 
 initMapInfo() {
   trigs = getentarray("trig_map_info", "targetname");
   for(i=0; i<trigs.size; i++) {
     trigs[i] thread doMapInfo(i);
   }
-  
 }
 
 doMapInfo(index) {
@@ -376,8 +348,7 @@ pShowMapInfo(trig_name, map_info, y_offset) {
   self removeTempTrigger(trig_name);
 }
 
-pShowMapInfoText(map_info, y_offset)
-{
+pShowMapInfoText(map_info, y_offset) {
   // Displays the map name and author when entering a specific map part in part 4
   self endon("disconnect");
 
@@ -487,7 +458,6 @@ initHideQuote() {
   }
 }
 
-
 hideQuote() {
   cover = getent(self.target, "targetname");
   quote = getent(cover.target, "targetname");
@@ -504,8 +474,6 @@ hideQuote() {
   self delete();
 }
 
-
-
 initMapPartTeleports() {
   trigs = getentarray("finish_map_part_teleport", "targetname");
   for(i = 0; i < trigs.size; i++) {
@@ -519,7 +487,7 @@ trigMapPartTeleport() {
     self waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
-      player thread pTeleportToMapPart(self.script_noteworthy, target);
+      player pTeleportToMapPart(self.script_noteworthy, target);
     }
     wait 0.1;
   }
@@ -528,19 +496,19 @@ trigMapPartTeleport() {
 pTeleportToMapPart(part_name, target) {
   switch(part_name) {
     case "p1":
-      thread pEnterP1(target);
+      self thread pEnterP1(target);
       break;
     case "p2":
-      thread pEnterP2(target);
+      self thread pEnterP2(target);
       break;
     case "p3":
-      thread pEnterP3(target);
+      self thread pEnterP3(target);
       break;
     case "p4":
-      thread pEnterP4FromFinish(target);
+      self thread pEnterP4FromFinish(target);
       break;
     case "end":
-      thread pEnterGallery(target);
+      self thread pEnterGallery(target);
       break;
   }
 }
@@ -553,9 +521,9 @@ pEnterP4FromFinish(target) {
   self setplayerangles(target.angles);
   self freezecontrols(true);
   wait 1;
-  self thread pEnsurePart("p4_a");
+  self pEnsurePart("p4_a");
 
-  self pShowEnterText(3);
+  self pShowEnterText(4);
 
   wait 2.4;
   self freezecontrols(false);
@@ -564,14 +532,7 @@ pEnterP4FromFinish(target) {
   self setBusy(false);
 }
 
-ensureTrigAdded(trig_name)
-{
-  if(!self hasTrigger(trig_name))
-    self addTrigger(trig_name);
-}
-
-p2StopAmbient()
-{
+p2StopAmbient() {
   trig = getent("p2_stop_ambient", "targetname");
   trig_name = "p2_stop_ambient";
   while(1)
@@ -585,8 +546,7 @@ p2StopAmbient()
   }
 }
 
-initSnowStorm()
-{
+initSnowStorm() {
   speakers = getentarray("snow_storm", "targetname");
   for(i = 0; i < speakers.size; i++) {
     speakers[i] playloopsound("snow_storm");
@@ -598,15 +558,13 @@ initSnowStorm()
   }
 }
 
-initTeleports()
-{
+initTeleports() {
   teleports = getentarray("teleport_classic","targetname");
   for(i = 0; i < teleports.size; i++)
     teleports[i] thread classicTeleport(i);
 }
 
-classicTeleport(i)
-{
+classicTeleport(i) {
   entTarget = getent(self.target, "targetname");
   trig_name = "classic_tp_" + i;
   should_set_angles = self.script_noteworthy;
@@ -616,7 +574,7 @@ classicTeleport(i)
     if(!player isBusy())
     {
       player setBusy(true);
-      player ensureTrigAdded(trig_name);
+      player addTrigger(trig_name);
       player setorigin(entTarget.origin);
       if(isdefined(should_set_angles))
         player setPlayerAngles(entTarget.angles);
@@ -626,8 +584,7 @@ classicTeleport(i)
   }
 }
 
-initFadeTeleports()
-{
+initFadeTeleports() {
   teleporters = getentarray("teleport_fade", "targetname");
   for(i = 0; i < teleporters.size; i++)
   {
@@ -635,23 +592,20 @@ initFadeTeleports()
   }
 }
 
-fadeTeleport(i)
-{
+fadeTeleport(i) {
   target = getent(self.target, "targetname");
   trig_name = "fade_tp_" + i;
-  while(true)
-  {
+  while(true) {
     self waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
-      player ensureTrigAdded(trig_name);
+      player addTrigger(trig_name);
       player thread pFadeTeleport(target, i);
     }
   }
 }
 
-pFadeTeleport(target, i)
-{
+pFadeTeleport(target, i) {
   self endon("disconnect");
   self freezecontrols(true);	
   self hudFadeBlack(0.5, false, 1);
@@ -663,36 +617,33 @@ pFadeTeleport(target, i)
   self setBusy(false);
 }
 
-initToiletDoor()
-{
+initToiletDoor() {
   door = getent ("toilet_door","targetname");
   trig = getent ("toilet_doortrig","targetname");
   door_sound = getent ("door_sound","targetname");
-  while (1)
-  {
+  while (1) {
     trig waittill ("trigger");
     door rotateto ((0, 90,0), 1);
     door_sound playsound("castle_dooropen");
-    wait (5);
+    door waittill("rotatedone");
+    wait 4;
     door notsolid();
     door rotateto ((0, 0,0), 1.7);
     door_sound playsound("castle_slamdoor");
     door waittill("rotatedone");
     door solid();
-    wait 1;
   }
 }
 
-enterP1()
-{
+enterP1() {
   trig = getent("enter_p1", "targetname");
   target = getent(trig.target, "targetname");
 
-  while(true)
-  {
+  while(true) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p1");
       player thread pEnterP1(target);
     }
     
@@ -700,12 +651,10 @@ enterP1()
   }
 }
 
-pEnterP1(target)
-{
+pEnterP1(target) {
     self endon("disconnect");
-    self ensureTrigAdded("enter_p1");
 
-    self thread pEnsurePart("p1");
+    self pEnsurePart("p1");
     self freezecontrols(true);
     self hudFadeBlack(0.1, false, 1);
     wait 0.5;
@@ -717,31 +666,19 @@ pEnterP1(target)
     self setBusy(false);
 }
 
-initShowEnterText()
-{
-  trigs = getentarray("show_enter_text", "targetname");
-  for(i = 0; i < trigs.size; i++)
-  {
-    trigs[i] thread trigShowEnterText();
-  }
-}
-
-trigShowEnterText()
-{
-  p_index = self.script_noteworthy;
-  trig_name = "show_text_"+p_index;
-  while(true)
-  {
-    self waittill("trigger", player);
+initShowEnterP1Text() {
+  trig = getent("show_enter_text", "targetname");
+  trig_name = "show_enter_text";
+  while(true) {
+    trig waittill("trigger", player);
     if(!player hasTrigger(trig_name)) {
-      player thread pShowEnterText(p_index);
       player addTrigger(trig_name);
+      player thread pShowEnterText(1);
     }
   }
 }
 
-pShowEnterText(part_index, x1, y1, x2, y2)
-{
+pShowEnterText(part_index, x1, y1, x2, y2) {
   // Displays text when entering a new part. Default placement is in the center of the screen.
   self endon("disconnect");
 
@@ -772,7 +709,7 @@ pShowEnterText(part_index, x1, y1, x2, y2)
 
   partentertext.alignX = "center";
   partentertext.alignY = "bottom";
-  partentertext settext(level.entertexts[part_index]);
+  partentertext settext(level.entertexts[part_index - 1]);
   partentertext.alpha = 0;
   partentertext fadeovertime(1);
   partentertext.alpha = 1;
@@ -789,7 +726,7 @@ pShowEnterText(part_index, x1, y1, x2, y2)
   partentertext2.fontscale = 1.15;
   partentertext2.alignX = "center";
   partentertext2.alignY = "bottom";
-  partentertext2 settext(level.entertexts2[part_index]);
+  partentertext2 settext(level.entertexts2[part_index - 1]);
   partentertext2.alpha = 0;
   partentertext2 fadeovertime(1.5);
   partentertext2.alpha = 1;
@@ -806,8 +743,7 @@ pShowEnterText(part_index, x1, y1, x2, y2)
   partentertext2 destroy();
 }
 
-enterP2()
-{
+enterP2() {
   trig = getent("enter_p2", "targetname");
   target = getent(trig.target, "targetname");
   while(1)
@@ -815,6 +751,7 @@ enterP2()
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p2");
       player thread pEnterP2(target);
     }
 
@@ -822,25 +759,23 @@ enterP2()
   }
 }
 
-pEnterP2(target)
-{
-    self endon("disconnect");
-    self ensureTrigAdded("enter_p2");
+pEnterP2(target) {
+  self endon("disconnect");
 
-    self thread pEnsurePart("p2");
-    self freezecontrols(true);
-    self hudFadeBlack(0.2, false, 1);
-    wait 4;
-    self thread pShowEnterText(1, undefined, undefined, 319);
-    wait 7;
+  self pEnsurePart("p2");
+  self freezecontrols(true);
+  self hudFadeBlack(0.2, false, 1);
+  wait 4;
+  self thread pShowEnterText(2, undefined, undefined, 319);
+  wait 7;
 
-    self setorigin(target.origin);
-    self setplayerangles(target.angles);
+  self setorigin(target.origin);
+  self setplayerangles(target.angles);
 
-    self freezecontrols(false);
-    self hudFadeBlack(4, true, 0);
-    
-    self setBusy(false);
+  self freezecontrols(false);
+  self hudFadeBlack(4, true, 0);
+
+  self setBusy(false);
 }
 
 initLeap() {
@@ -863,32 +798,29 @@ pLeap() {
   self removeTempTrigger("leap");
 }
 
-enterP3()
-{
+enterP3() {
   trig = getent("enter_p3", "targetname");
   target = getent(trig.target, "targetname");
 
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p3");
       player thread pEnterP3(target);
     }
     wait 0.1;
   }
 }
 
-pEnterP3(target)
-{
+pEnterP3(target) {
   self endon("disconnect");
-  self ensureTrigAdded("enter_p3");
 
   self freezecontrols(true);
   self hudFadeBlack(1, false, 1);
   wait 1;
-  self thread pEnsurePart("p3");
-  self thread pShowEnterText(2);
+  self pEnsurePart("p3");
+  self thread pShowEnterText(3);
   wait 5.1;
 
   self setorigin(target.origin);
@@ -901,15 +833,14 @@ pEnterP3(target)
   self setBusy(false);
 }
 
-enterP4A()
-{
+enterP4A() {
   trig = getent("enter_p4_a", "targetname");
   target = getent(trig.target, "targetname");
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p4_a");
       player thread pEnterP4A(target);
     }
     
@@ -917,10 +848,8 @@ enterP4A()
   }
 }
 
-pEnterP4A(target)
-{
+pEnterP4A(target) {
     self endon("disconnect");
-    self ensureTrigAdded("enter_p4_a");
 
     model = spawn("script_origin",(0,0,0));
     model.origin = self.origin;
@@ -939,9 +868,9 @@ pEnterP4A(target)
 
     self hudFadeRed(1.5, false, 0);
     wait 1;
-    self thread pEnsurePart("p4_a");
+    self pEnsurePart("p4_a");
 
-    self pShowEnterText(3);
+    self pShowEnterText(4);
   
     wait 2.4;
     self freezecontrols(false);
@@ -950,28 +879,23 @@ pEnterP4A(target)
     self setBusy(false);
 }
 
-enterP4B()
-{
+enterP4B() {
   trig = getent("enter_p4_b", "targetname");
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p4_b");
       player thread pEnterP4B();
     }
-    
     wait 0.1;
   }
 }
 
-pEnterP4B()
-{
+pEnterP4B() {
   self endon("disconnect");
-  self ensureTrigAdded("enter_p4_b");
   
   self pEnsurePart("p4_b");
-
   model = spawn("script_origin", (0,0,0));
   model.origin = self.origin;
   self linkto(model);
@@ -984,12 +908,10 @@ pEnterP4B()
   self setBusy(false);
 }
 
-enterP4BTele()
-{
+enterP4BTele() {
   trig = getent("enter_p4_b_tele", "targetname");
   target = getent(trig.target, "targetname");
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
@@ -999,8 +921,7 @@ enterP4BTele()
   }
 }
 
-pEnterP4BTele(target)
-{
+pEnterP4BTele(target) {
   self endon("disconnect");
   self thread fadeFromWhite(4, 1, 0);
 
@@ -1014,8 +935,7 @@ pEnterP4BTele(target)
 }
 
 
-hudFadeRed_black()
-{
+hudFadeRed_black() {
   self endon("disconnect");
 
   self hudFadeRed(1.5, false, 1);
@@ -1027,21 +947,21 @@ hudFadeRed_black()
   self hudFadeBlack(4, true, 0);
 }
 
-pDoMusic(part_name)
-{
+pDoMusic(part_name) {
   self endon("disconnect");
   self endon("player_reset");
 
+  self notify("domusic");
+  self endon("domusic");
+
   self setAmbient(); // Stop the old ambient music
-  switch(part_name)
-  {
+  switch(part_name) {
     case "p1":
       // Only the second track from p1 should repeat
       sundown_seconds = 334;
       self setAmbient("ambient_p1_sundown", sundown_seconds, false);
       wait sundown_seconds;
-      if(self.cly["part"] == part_name)
-        self setAmbient("ambient_p1_dreams", 308);
+      self setAmbient("ambient_p1_dreams", 308);
       break;
     case "p2":
       self playlocalsound("boom");
@@ -1063,32 +983,26 @@ pDoMusic(part_name)
   }
 }
 
-pEnsurePart(name)
-{
+pEnsurePart(name) {
   if(!isdefined(self.cly))
     self.cly = [];
 
-  if(!isDefined(self.cly["part"]) || self.cly["part"] != name)
-  {
+  if(!isDefined(self.cly["part"]) || self.cly["part"] != name) {
     self.cly["part"] = name;
     self thread pDoMusic(name);
   }
 }
 
-initBouncePads()
-{
+initBouncePads() {
   pads = getentarray("bounce_pad","targetname");
-  for(i=0; i<pads.size; i++)
-  {
+  for(i=0; i<pads.size; i++) {
     pads[i] thread doBouncePad();
   }
 }
 
-doBouncePad()
-{
+doBouncePad() {
   target = getent(self.target, "targetname");
-  while (1)
-  {
+  while (1) {
     self waittill ("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
@@ -1107,15 +1021,13 @@ jump(end, v0) {
   model.angles = self.angles;;
   self linkto (model);
 
-  if(!isdefined(v0))
-  {
+  if(!isdefined(v0)) {
     v0 = 1575;
   }
   start = self.origin;
   height = end[2] - start[2];
 
-  if(height > 0)
-  {
+  if(height > 0) {
     v0_min_squared = height * getcvarint("g_gravity") / 0.5;
   }		
   t0 = v0 / getcvarint("g_gravity");
@@ -1139,28 +1051,23 @@ jump(end, v0) {
   model delete();
 } 
 
-sqrt( x )
-{
+sqrt(x) {
     y = x;
-    for( z = x *0.25 ; abs( z - y ) >= 0.001 ; y = ( z + ( x / z ) ) * 0.5 )
-    {
-        z = y;
+    for(z = x * 0.25; abs(z - y) >= 0.001; y = (z + (x / z)) * 0.5) {
+      z = y;
     }
     return y;
 } 
 
-abs (num)
-{
+abs(num) {
   if (num < 0)
     num*= -1;
   return num;
 }
-hudFadeRed(time, hud, a)
-{
+hudFadeRed(time, hud, a) {
   self endon("disconnect");
 
-  if(!isdefined(self.hudfadered))
-  {
+  if(!isdefined(self.hudfadered)) {
     self.hudfadered = newclienthudelem(self);
     self.hudfadered.x = 0;
     self.hudfadered.y = 0;
@@ -1188,12 +1095,10 @@ hudFadeRed(time, hud, a)
   }
 }
 
-hudFadeBlack(time, hud, a)
-{
+hudFadeBlack(time, hud, a) {
   self endon("disconnect");
   
-  if(!isdefined(self.fadetoblack))
-  {
+  if(!isdefined(self.fadetoblack)) {
     self.fadetoblack = newclienthudelem(self);
     self.fadetoblack.x = 0;
     self.fadetoblack.y = 0;
@@ -1219,8 +1124,7 @@ hudFadeBlack(time, hud, a)
   } 
 }
 
-hudFadeWhiteBlack()
-{
+hudFadeWhiteBlack() {
   self endon("disconnect");
   
   self hudFadeWhite(2, false, 1);
@@ -1231,12 +1135,10 @@ hudFadeWhiteBlack()
   self hudFadeBlack(4, true, 0);
 }
 
-hudFadeWhite(time, hud, a)
-{
+hudFadeWhite(time, hud, a) {
   self endon("disconnect");
   
-  if(!isdefined(self.hudfadewhite))
-  {
+  if(!isdefined(self.hudfadewhite)) {
     self.hudfadewhite = newclienthudelem(self);
     self.hudfadewhite.x = 0;
     self.hudfadewhite.y = 0;
@@ -1263,12 +1165,10 @@ hudFadeWhite(time, hud, a)
   } 
 }
 
-fadeFromWhite(time, fadeFromAlpha, fadeToAlpha)
-{
+fadeFromWhite(time, fadeFromAlpha, fadeToAlpha) {
   self endon("disconnect");
   
-  if(!isdefined(self.fader))
-  {
+  if(!isdefined(self.fader)) {
     self.fader = newclienthudelem(self);
     self.fader.x = 0;
     self.fader.y = 0;
@@ -1291,39 +1191,36 @@ fadeFromWhite(time, fadeFromAlpha, fadeToAlpha)
 //P4
 
 initTunnel(){
-  TUNNEL_FLOOR_COUNT = 5;
-  TUNNEL_MOVING_TIME = 23;  // How long it takes from top to bottom - more time => slower
+  // Starts the moving walls in the first section of P4
+  tunnel_floor_count = 5;
+  tunnel_moving_time = 23;  // How long it takes from top to bottom - more time => slower
 
-  for(i = 1; i <= TUNNEL_FLOOR_COUNT; i++)
-  {
+  for(i = 1; i <= tunnel_floor_count; i++) {
     floor = getentarray("tunnel_floor_" + i, "targetname");
-    for(j = 0; j < floor.size; j++)
-    {
-      floor[j] thread tunnelMoveDown(i, TUNNEL_FLOOR_COUNT, TUNNEL_MOVING_TIME);
+    for(j = 0; j < floor.size; j++) {
+      floor[j] thread tunnelMoveDown(i, tunnel_floor_count, tunnel_moving_time);
     }
   }
 }
 
-enterFinish()
-{
+enterFinish() {
   // The garden
   trig = getent("enter_finish", "targetname");
   target = getent(trig.target, "targetname");
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_finish");
       player thread pEnterFinish(target);
     }
     wait 0.1;
   }
 }
 
-pEnterFinish(target)
-{
+pEnterFinish(target) {
   self endon("disconnect");
-  self ensureTrigAdded("enter_finish");
+
   orig = spawn ("script_origin",(0,0,0));
   orig.origin = self.origin;
   self linkto(orig);
@@ -1339,42 +1236,37 @@ pEnterFinish(target)
   orig delete();
   wait 3;
 
-  
   self setBusy(false);
 }
 
-tunnelMoveDown(num, floor_count, moving_time)
-{
+tunnelMoveDown(num, floor_count, moving_time) {
+  // Moves walls in p4 down and back infinitely making an elevator effect
   moving_distance = -6017;
-  while(true)
-  {
-    for(i = 1; i < num; i++)
-      {
-        self moveZ(moving_distance, moving_time);
-        wait moving_time;
-      }	
-      self hide();
-      self notsolid();
-      self moveZ(-1 * moving_distance * (floor_count - 1), 0.1);
+  while(true) {
+    for(i = 1; i < num; i++) {
+      self moveZ(moving_distance, moving_time);
       wait moving_time;
-      self show();
-      for(; i < floor_count; i++)
-      {
-        self moveZ(moving_distance, moving_time);
-        wait moving_time;
-      }
+    }	
+    self hide();
+    self notsolid();
+    self moveZ(-1 * moving_distance * (floor_count - 1), 0.1);
+    wait moving_time;
+    self show();
+    for(; i < floor_count; i++) {
+      self moveZ(moving_distance, moving_time);
+      wait moving_time;
+    }
   }
 }
 
-initEnterGallery()
-{
+initEnterGallery() {
   trig = getent("enter_gallery", "targetname");
   target = getent(trig.target, "targetname");
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_gallery_tp");
       player thread pEnterGallery(target);
     }
     wait 0.1;
@@ -1383,7 +1275,6 @@ initEnterGallery()
 
 pEnterGallery(target) {
   self endon("disconnect");
-  self ensureTrigAdded("enter_gallery_tp");
   self thread pDoMusic("gallery");
   self hudFadeBlack(0.5, false, 1);
 

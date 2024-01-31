@@ -1,3 +1,8 @@
+/*
+All the logic behind the disco in the finish section of the map
+*/
+
+
 // #include JH\_maptools; // JH only
 // #include JH\_ambient;  // JH only
 #include maps\mp\jm_memento\_cly_maptools;  // Non-JH only
@@ -14,24 +19,21 @@ main()
   level.cly["MENU_TIME_LIMIT"] = 10;
   // ---------------------
 
-  thread initFloor();
+  initMusicPlayer();
+  initFloor();
+  hideTracks();
+  initTrackPickupTrig();
   thread initBeams();
-  thread initMusicPlayer();
   thread prepareWoofers();
   thread prepareFloors();
-
-  wait 0.1;
-
   thread initMenu();
-  thread hideTracks();
-  thread initTrackPickupTrig();
 }
 
 playSabaton() {
   duration = level.cly["music_player"]["track_durations"]["sabaton"];
   setTimeLeft(duration);
 
-  thread startMusic("sabaton");
+  startMusic("sabaton");
   thread doSabatonFx();
 }
 
@@ -937,15 +939,6 @@ updatePlayingTrack(track_id) {
       track[i] hide();
   }
 }
-
-menuOnDisconnect() {
-  // Clean up menu while it's open and player disconnects
-  self endon("menu_closed");
-  self waittill("disconnect");
-
-  self cleanUpMenu();
-}
-
 
 initTrackPickupTrig() {
   trigs = getentarray("party_track_pickup_trig", "targetname");

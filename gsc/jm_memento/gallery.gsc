@@ -72,10 +72,11 @@ main()
   level.cly["player_claay"] = "Un^9Real^3.^9JumperZ^3/^7claay";
 
  
-  thread initPlayerTrigs();
+  initPlayerTrigs();
   thread initBodyFall();
   thread initGery();
   thread initTrela();
+  thread initTomis();
   thread initPlayerStats();
   thread initUjStats();
 
@@ -174,15 +175,15 @@ playSoundAfter(trig, orig, sound, duration) {
   self endon("disconnect");
   trigger_after = 5;  // Seconds
 
-  while(trigger_after > 0 && self istouching(trig)) {
+  while(trigger_after > 0) {
+    if(!self istouching(trig))
+      return;
+    
     wait 0.05;
     trigger_after -= 0.05;
   }
- 
-  if(self istouching(trig)) {
-    orig playSound(sound);
-    wait duration;
-  }
+  orig playSound(sound);
+  wait duration;
 }
 
 initBodyFall() {
