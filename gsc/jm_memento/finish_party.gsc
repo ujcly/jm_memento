@@ -14,24 +14,22 @@ main()
   level.cly["MENU_TIME_LIMIT"] = 10;
   // ---------------------
 
-  thread initFloor();
+  initMusicPlayer();
+  initFloor();
+  hideTracks();
+  initTrackPickupTrig();
   thread initBeams();
-  thread initMusicPlayer();
   thread prepareWoofers();
   thread prepareFloors();
-
-  wait 0.1;
-
+  // wait 0.1;
   thread initMenu();
-  thread hideTracks();
-  thread initTrackPickupTrig();
 }
 
 playSabaton() {
   duration = level.cly["music_player"]["track_durations"]["sabaton"];
   setTimeLeft(duration);
 
-  thread startMusic("sabaton");
+  startMusic("sabaton");
   thread doSabatonFx();
 }
 

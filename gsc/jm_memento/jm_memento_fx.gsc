@@ -83,18 +83,17 @@ main()
   // Quotes
   level._effect["quote_poof"] =  loadfx ("fx/cly/cly_quote_poof3.efx");
 
-  thread initParticlesOrange();
-  thread initLights();
-  thread initFires();
-  thread initParticleStreams();
-  thread initParticleYellow();
-  thread initDescendGate();
-  thread initFireflies();
-  thread initFlyingShit();
+  initParticlesOrange();
+  initLights();
+  initFires();
+  initParticleStreams();
+  initParticleYellow();
+  initDescendGate();
+  initFireflies();
+  initFlyingShit();
+  
   thread initFxAscend();
 }
-
-
 
 initFireflies() 
 {
@@ -183,7 +182,6 @@ initFlyingShit() {
   flying_shit_ending = getent("flying_shit_ending", "targetname");
 
   playLoopedFx(level._effect["flying_shit_ending"], 5, flying_shit_ending.origin);
-  
   playLoopedFx(level._effect["flying_shit1"], 7, flying_shit1.origin);
 }
 

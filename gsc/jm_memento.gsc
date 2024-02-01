@@ -34,9 +34,9 @@ main(){
   maps\mp\jm_memento\gallery::main();
   maps\mp\jm_memento\finish_party::main();
 
-  thread initTeleports();
-  thread initFadeTeleports();
-  thread initShowEnterText();
+  initTeleports();
+  initFadeTeleports();
+  initShowEnterText();
 
   thread enterP1();
   thread enterP2();
@@ -45,14 +45,14 @@ main(){
   thread enterP4B();
   thread enterP4BTele();
   
-  thread initSecretTeleports();
-  thread initBoothTeleports();
+  initSecretTeleports();
+  initBoothTeleports();
 
-  // Spawn cabin
-  thread initSnowStorm();
+  // Spawn & renai
+  initSnowStorm();
 
   // Gaps
-  thread initTrigNice();
+  initTrigNice();
   
   // P1
   thread initPotatoStart();
@@ -65,22 +65,22 @@ main(){
   thread initLeap();
   
   // P3
-  thread initBouncePads();
+  initBouncePads();
 
   // P4
-  thread initTunnel();
+  initTunnel();
+  initMapInfo();
+  initHideQuote();
   thread initBullseye();
   thread enterFinish();
-  thread initHideQuote();
   thread initMoveKappa();
-  thread initMapInfo();
   thread initKanyeTeleport();
   thread initDescendOld();
   thread initCruiseTop();
 
   // Finish
+  initMapPartTeleports();
   thread initEnterGallery();
-  thread initMapPartTeleports();
   thread initTomis();
   thread initPotatoEnd();
 

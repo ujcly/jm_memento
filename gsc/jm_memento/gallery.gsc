@@ -72,7 +72,7 @@ main()
   level.cly["player_claay"] = "Un^9Real^3.^9JumperZ^3/^7claay";
 
  
-  thread initPlayerTrigs();
+  initPlayerTrigs();
   thread initBodyFall();
   thread initGery();
   thread initTrela();
