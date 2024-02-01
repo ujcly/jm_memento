@@ -89,8 +89,7 @@ main(){
 }
 
 onHistoryLoad() {
-   // Called when player loads a run from history (JH only)
-  // part triggers: enter_p4_b, enter_p4_a, enter_p3, enter_p2, enter_p1
+  // Called when player loads a run from history (JH only). Triggers are loaded from the previous run, we need to pick the latest.
   if(self hasTrigger("enter_p4_b"))
     self pEnsurePart("p4_b");
   else if(self hasTrigger("enter_p4_a"))
@@ -374,8 +373,7 @@ pShowMapInfo(trig_name, map_info, y_offset) {
   self removeTempTrigger(trig_name);
 }
 
-pShowMapInfoText(map_info, y_offset)
-{
+pShowMapInfoText(map_info, y_offset) {
   // Displays the map name and author when entering a specific map part in part 4
   self endon("disconnect");
 
@@ -653,6 +651,7 @@ initToiletDoor() {
     door rotateto ((0, 90,0), 1);
     door_sound playsound("castle_dooropen");
     door waittill("rotatedone");
+    wait 4;
     door notsolid();
     door rotateto ((0, 0,0), 1.7);
     door_sound playsound("castle_slamdoor");
@@ -769,8 +768,7 @@ pShowEnterText(part_index, x1, y1, x2, y2) {
   partentertext2 destroy();
 }
 
-enterP2()
-{
+enterP2() {
   trig = getent("enter_p2", "targetname");
   target = getent(trig.target, "targetname");
   while(1)
@@ -825,8 +823,7 @@ pLeap() {
   self removeTempTrigger("leap");
 }
 
-enterP3()
-{
+enterP3() {
   trig = getent("enter_p3", "targetname");
   target = getent(trig.target, "targetname");
 
@@ -842,8 +839,7 @@ enterP3()
   }
 }
 
-pEnterP3(target)
-{
+pEnterP3(target) {
   self endon("disconnect");
 
   self freezecontrols(true);
@@ -863,8 +859,7 @@ pEnterP3(target)
   self setBusy(false);
 }
 
-enterP4A()
-{
+enterP4A() {
   trig = getent("enter_p4_a", "targetname");
   target = getent(trig.target, "targetname");
   while(1)
@@ -880,8 +875,7 @@ enterP4A()
   }
 }
 
-pEnterP4A(target)
-{
+pEnterP4A(target) {
     self endon("disconnect");
 
     model = spawn("script_origin",(0,0,0));
@@ -912,11 +906,9 @@ pEnterP4A(target)
     self setBusy(false);
 }
 
-enterP4B()
-{
+enterP4B() {
   trig = getent("enter_p4_b", "targetname");
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
@@ -928,8 +920,7 @@ enterP4B()
   }
 }
 
-pEnterP4B()
-{
+pEnterP4B() {
   self endon("disconnect");
   
   self pEnsurePart("p4_b");
@@ -945,8 +936,7 @@ pEnterP4B()
   self setBusy(false);
 }
 
-enterP4BTele()
-{
+enterP4BTele() {
   trig = getent("enter_p4_b_tele", "targetname");
   target = getent(trig.target, "targetname");
   while(1)
@@ -960,8 +950,7 @@ enterP4BTele()
   }
 }
 
-pEnterP4BTele(target)
-{
+pEnterP4BTele(target) {
   self endon("disconnect");
   self thread fadeFromWhite(4, 1, 0);
 
@@ -975,8 +964,7 @@ pEnterP4BTele(target)
 }
 
 
-hudFadeRed_black()
-{
+hudFadeRed_black() {
   self endon("disconnect");
 
   self hudFadeRed(1.5, false, 1);
@@ -988,21 +976,21 @@ hudFadeRed_black()
   self hudFadeBlack(4, true, 0);
 }
 
-pDoMusic(part_name)
-{
+pDoMusic(part_name) {
   self endon("disconnect");
   self endon("player_reset");
 
+  self notify("domusic");
+  self endon("domusic");
+
   self setAmbient(); // Stop the old ambient music
-  switch(part_name)
-  {
+  switch(part_name) {
     case "p1":
       // Only the second track from p1 should repeat
       sundown_seconds = 334;
       self setAmbient("ambient_p1_sundown", sundown_seconds, false);
       wait sundown_seconds;
-      if(self.cly["part"] == part_name)
-        self setAmbient("ambient_p1_dreams", 308);
+      self setAmbient("ambient_p1_dreams", 308);
       break;
     case "p2":
       self playlocalsound("boom");
@@ -1024,20 +1012,17 @@ pDoMusic(part_name)
   }
 }
 
-pEnsurePart(name)
-{
+pEnsurePart(name) {
   if(!isdefined(self.cly))
     self.cly = [];
 
-  if(!isDefined(self.cly["part"]) || self.cly["part"] != name)
-  {
+  if(!isDefined(self.cly["part"]) || self.cly["part"] != name) {
     self.cly["part"] = name;
     self thread pDoMusic(name);
   }
 }
 
-initBouncePads()
-{
+initBouncePads() {
   pads = getentarray("bounce_pad","targetname");
   for(i=0; i<pads.size; i++)
   {
@@ -1045,8 +1030,7 @@ initBouncePads()
   }
 }
 
-doBouncePad()
-{
+doBouncePad() {
   target = getent(self.target, "targetname");
   while (1)
   {
@@ -1068,15 +1052,13 @@ jump(end, v0) {
   model.angles = self.angles;;
   self linkto (model);
 
-  if(!isdefined(v0))
-  {
+  if(!isdefined(v0)) {
     v0 = 1575;
   }
   start = self.origin;
   height = end[2] - start[2];
 
-  if(height > 0)
-  {
+  if(height > 0) {
     v0_min_squared = height * getcvarint("g_gravity") / 0.5;
   }		
   t0 = v0 / getcvarint("g_gravity");
@@ -1100,28 +1082,23 @@ jump(end, v0) {
   model delete();
 } 
 
-sqrt( x )
-{
+sqrt(x) {
     y = x;
-    for( z = x *0.25 ; abs( z - y ) >= 0.001 ; y = ( z + ( x / z ) ) * 0.5 )
-    {
-        z = y;
+    for(z = x * 0.25; abs(z - y) >= 0.001; y = (z + (x / z) ) * 0.5) {
+      z = y;
     }
     return y;
 } 
 
-abs (num)
-{
+abs(num) {
   if (num < 0)
     num*= -1;
   return num;
 }
-hudFadeRed(time, hud, a)
-{
+hudFadeRed(time, hud, a) {
   self endon("disconnect");
 
-  if(!isdefined(self.hudfadered))
-  {
+  if(!isdefined(self.hudfadered)) {
     self.hudfadered = newclienthudelem(self);
     self.hudfadered.x = 0;
     self.hudfadered.y = 0;
@@ -1149,8 +1126,7 @@ hudFadeRed(time, hud, a)
   }
 }
 
-hudFadeBlack(time, hud, a)
-{
+hudFadeBlack(time, hud, a) {
   self endon("disconnect");
   
   if(!isdefined(self.fadetoblack))
@@ -1180,8 +1156,7 @@ hudFadeBlack(time, hud, a)
   } 
 }
 
-hudFadeWhiteBlack()
-{
+hudFadeWhiteBlack() {
   self endon("disconnect");
   
   self hudFadeWhite(2, false, 1);
@@ -1192,8 +1167,7 @@ hudFadeWhiteBlack()
   self hudFadeBlack(4, true, 0);
 }
 
-hudFadeWhite(time, hud, a)
-{
+hudFadeWhite(time, hud, a) {
   self endon("disconnect");
   
   if(!isdefined(self.hudfadewhite))
@@ -1224,12 +1198,10 @@ hudFadeWhite(time, hud, a)
   } 
 }
 
-fadeFromWhite(time, fadeFromAlpha, fadeToAlpha)
-{
+fadeFromWhite(time, fadeFromAlpha, fadeToAlpha) {
   self endon("disconnect");
   
-  if(!isdefined(self.fader))
-  {
+  if(!isdefined(self.fader)) {
     self.fader = newclienthudelem(self);
     self.fader.x = 0;
     self.fader.y = 0;
@@ -1264,13 +1236,11 @@ initTunnel(){
   }
 }
 
-enterFinish()
-{
+enterFinish() {
   // The garden
   trig = getent("enter_finish", "targetname");
   target = getent(trig.target, "targetname");
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
@@ -1281,8 +1251,7 @@ enterFinish()
   }
 }
 
-pEnterFinish(target)
-{
+pEnterFinish(target) {
   self endon("disconnect");
 
   orig = spawn ("script_origin",(0,0,0));

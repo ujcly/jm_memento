@@ -95,15 +95,13 @@ main()
   thread initFxAscend();
 }
 
-initFireflies() 
-{
+initFireflies()  {
   ents = getentarray("fx_fireflies", "targetname");
   for(i = 0; i < ents.size; i++)
     playLoopedFx(level._effect["fireflies"], 1.5, ents[i].origin);
 }
 
-initDescendGate()
-{
+initDescendGate() {
   ents = getentarray("fx_descend_gate", "targetname");
   for(i = 0; i < ents.size; i++)
   {
@@ -111,8 +109,7 @@ initDescendGate()
   }
 }
 
-initParticleYellow()
-{
+initParticleYellow() {
   ring = getentarray("fx_particle_ring", "targetname");
   for(i = 0; i < ring.size; i++)
   {
@@ -120,22 +117,19 @@ initParticleYellow()
   }
 }
 
-initParticleStreams()
-{
+initParticleStreams() {
   core = getentarray("fx_particle_stream_core", "targetname");
   for(i=0; i<core.size; i++)
     playLoopedFx(level._effect["particle_descend_stream"], 1.5, core[i].origin);
 }
 
-initParticlesOrange()
-{
+initParticlesOrange() {
   orig = getentarray("fx_particles_orange", "targetname");
   for(i = 0; i < orig.size; i++)
     playLoopedFx(level._effect["particles_orange"], 1, orig[i].origin);
 }
 
-initLights()
-{
+initLights() {
   small_lights_blue = getentarray("fx_small_light_blue", "targetname");
   small_lights_orange = getentarray("fx_small_light_orange", "targetname");
   small_lights_purple = getentarray("fx_small_light_purple", "targetname");
@@ -156,11 +150,9 @@ initLights()
 
   for(i = 0; i < blue_neons.size; i++)	
     playLoopedFx(level._effect["neon_light"], 1.5, blue_neons[i].origin, 0, anglesToForward(blue_neons[i].angles));
-
 }
 
-initFires()
-{	
+initFires() {	
   fires = getentarray("fire", "targetname");
   torches = getentarray("wall_torch_fire_origin", "targetname");
   for(i=0;i<fires.size;i++)
@@ -170,8 +162,7 @@ initFires()
     torches[i] thread lightFire("fire_torch");
 }
 
-lightFire(fire_name)
-{
+lightFire(fire_name) {
   playLoopedFx(level._effect[fire_name], 0.7, self.origin);
   self playloopsound("fire");
 }
@@ -185,14 +176,12 @@ initFlyingShit() {
   playLoopedFx(level._effect["flying_shit1"], 7, flying_shit1.origin);
 }
 
-initFxAscend()
-{
+initFxAscend() {
   particles_orig = getent("fx_ascend_particles", "targetname");
   playLoopedFx(level._effect["ascend_particles"], 0.6, particles_orig.origin);
   
   trig = getent("fx_ascend", "targetname");
-  while(1)
-  {
+  while(1) {
     trig waittill("trigger", player);
     PlayFX(level._effect["ascend"], player.origin);
     wait 5;
