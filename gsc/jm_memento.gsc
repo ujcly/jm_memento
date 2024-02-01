@@ -1200,13 +1200,13 @@ fadeFromWhite(time, fadeFromAlpha, fadeToAlpha) {
 
 initTunnel(){
   // Starts the moving walls in the first section of P4
-  tunnell_floor_count = 5;
+  tunnel_floor_count = 5;
   tunnel_moving_time = 23;  // How long it takes from top to bottom - more time => slower
 
-  for(i = 1; i <= tunnell_floor_count; i++) {
+  for(i = 1; i <= tunnel_floor_count; i++) {
     floor = getentarray("tunnel_floor_" + i, "targetname");
     for(j = 0; j < floor.size; j++) {
-      floor[j] thread tunnelMoveDown(i, tunnell_floor_count, tunnel_moving_time);
+      floor[j] thread tunnelMoveDown(i, tunnel_floor_count, tunnel_moving_time);
     }
   }
 }
