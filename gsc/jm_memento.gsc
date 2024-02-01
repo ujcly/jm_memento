@@ -333,19 +333,16 @@ initTomis() {
 
 tomisCountDown(trig, orig) {
   self endon("disconnect");
-  time = 5;
 
-  while(time > 0 && self istouching(trig))
-    {
-        wait 0.05;
-        time -= 0.05;
-    }
- 
-    if(self istouching(trig))
-    {
-        orig playSound("tomis");
-        wait 29;
-    }
+  time = 5;
+  while(time > 0 && self istouching(trig)) {
+    wait 0.05;
+    time -= 0.05;
+  }
+  if(self istouching(trig)) {
+    orig playSound("tomis");
+    wait 29;
+  }
 }
 
 initMapInfo() {
@@ -668,13 +665,12 @@ initToiletDoor()
     trig waittill ("trigger");
     door rotateto ((0, 90,0), 1);
     door_sound playsound("castle_dooropen");
-    wait (5);
+    door waittill("rotatedone");
     door notsolid();
     door rotateto ((0, 0,0), 1.7);
     door_sound playsound("castle_slamdoor");
     door waittill("rotatedone");
     door solid();
-    wait 1;
   }
 }
 
@@ -1285,15 +1281,14 @@ fadeFromWhite(time, fadeFromAlpha, fadeToAlpha)
 //P4
 
 initTunnel(){
-  TUNNEL_FLOOR_COUNT = 5;
-  TUNNEL_MOVING_TIME = 23;  // How long it takes from top to bottom - more time => slower
+  // Starts the moving walls in the first section of P4
+  tunnell_floor_count = 5;
+  tunnel_moving_time = 23;  // How long it takes from top to bottom - more time => slower
 
-  for(i = 1; i <= TUNNEL_FLOOR_COUNT; i++)
-  {
+  for(i = 1; i <= tunnell_floor_count; i++) {
     floor = getentarray("tunnel_floor_" + i, "targetname");
-    for(j = 0; j < floor.size; j++)
-    {
-      floor[j] thread tunnelMoveDown(i, TUNNEL_FLOOR_COUNT, TUNNEL_MOVING_TIME);
+    for(j = 0; j < floor.size; j++) {
+      floor[j] thread tunnelMoveDown(i, tunnell_floor_count, tunnel_moving_time);
     }
   }
 }
@@ -1337,31 +1332,27 @@ pEnterFinish(target)
   self setBusy(false);
 }
 
-tunnelMoveDown(num, floor_count, moving_time)
-{
+tunnelMoveDown(num, floor_count, moving_time) {
+  // Moves walls in p4 down and back infinitely making an elevator effect
   moving_distance = -6017;
-  while(true)
-  {
-    for(i = 1; i < num; i++)
-      {
-        self moveZ(moving_distance, moving_time);
-        wait moving_time;
-      }	
-      self hide();
-      self notsolid();
-      self moveZ(-1 * moving_distance * (floor_count - 1), 0.1);
+  while(true) {
+    for(i = 1; i < num; i++) {
+      self moveZ(moving_distance, moving_time);
       wait moving_time;
-      self show();
-      for(; i < floor_count; i++)
-      {
-        self moveZ(moving_distance, moving_time);
-        wait moving_time;
-      }
+    }	
+    self hide();
+    self notsolid();
+    self moveZ(-1 * moving_distance * (floor_count - 1), 0.1);
+    wait moving_time;
+    self show();
+    for(; i < floor_count; i++) {
+      self moveZ(moving_distance, moving_time);
+      wait moving_time;
+    }
   }
 }
 
-initEnterGallery()
-{
+initEnterGallery() {
   trig = getent("enter_gallery", "targetname");
   target = getent(trig.target, "targetname");
   while(1)
