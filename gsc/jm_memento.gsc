@@ -161,6 +161,8 @@ initDescendOld() {
 }
 
 pDescendOld() {
+  self endon("disconnect");
+
   wait 0.8;
   self iprintln("^3H^7m it's gone");
   wait 2;
@@ -176,7 +178,7 @@ initKanyeTeleport() {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
-      player ensureTrigAdded("tp_kanye");
+      player addTrigger("tp_kanye");
       player thread pKanyeTeleport(target);
     }
     wait 0.1;
@@ -564,12 +566,6 @@ pEnterP4FromFinish(target) {
   self setBusy(false);
 }
 
-ensureTrigAdded(trig_name)
-{
-  if(!self hasTrigger(trig_name))
-    self addTrigger(trig_name);
-}
-
 p2StopAmbient()
 {
   trig = getent("p2_stop_ambient", "targetname");
@@ -616,7 +612,7 @@ classicTeleport(i)
     if(!player isBusy())
     {
       player setBusy(true);
-      player ensureTrigAdded(trig_name);
+      player addTrigger(trig_name);
       player setorigin(entTarget.origin);
       if(isdefined(should_set_angles))
         player setPlayerAngles(entTarget.angles);
@@ -644,7 +640,7 @@ fadeTeleport(i)
     self waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
-      player ensureTrigAdded(trig_name);
+      player addTrigger(trig_name);
       player thread pFadeTeleport(target, i);
     }
   }
@@ -703,7 +699,7 @@ enterP1()
 pEnterP1(target)
 {
     self endon("disconnect");
-    self ensureTrigAdded("enter_p1");
+    self addTrigger("enter_p1");
 
     self thread pEnsurePart("p1");
     self freezecontrols(true);
@@ -825,7 +821,7 @@ enterP2()
 pEnterP2(target)
 {
     self endon("disconnect");
-    self ensureTrigAdded("enter_p2");
+    self addTrigger("enter_p2");
 
     self thread pEnsurePart("p2");
     self freezecontrols(true);
@@ -882,7 +878,7 @@ enterP3()
 pEnterP3(target)
 {
   self endon("disconnect");
-  self ensureTrigAdded("enter_p3");
+  self addTrigger("enter_p3");
 
   self freezecontrols(true);
   self hudFadeBlack(1, false, 1);
@@ -920,7 +916,7 @@ enterP4A()
 pEnterP4A(target)
 {
     self endon("disconnect");
-    self ensureTrigAdded("enter_p4_a");
+    self addTrigger("enter_p4_a");
 
     model = spawn("script_origin",(0,0,0));
     model.origin = self.origin;
@@ -968,7 +964,7 @@ enterP4B()
 pEnterP4B()
 {
   self endon("disconnect");
-  self ensureTrigAdded("enter_p4_b");
+  self addTrigger("enter_p4_b");
   
   self pEnsurePart("p4_b");
 
@@ -1323,7 +1319,7 @@ enterFinish()
 pEnterFinish(target)
 {
   self endon("disconnect");
-  self ensureTrigAdded("enter_finish");
+  self addTrigger("enter_finish");
   orig = spawn ("script_origin",(0,0,0));
   orig.origin = self.origin;
   self linkto(orig);
@@ -1383,7 +1379,7 @@ initEnterGallery()
 
 pEnterGallery(target) {
   self endon("disconnect");
-  self ensureTrigAdded("enter_gallery_tp");
+  self addTrigger("enter_gallery_tp");
   self thread pDoMusic("gallery");
   self hudFadeBlack(0.5, false, 1);
 
