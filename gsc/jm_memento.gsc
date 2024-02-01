@@ -353,7 +353,6 @@ initMapInfo() {
   for(i=0; i<trigs.size; i++) {
     trigs[i] thread doMapInfo(i);
   }
-  
 }
 
 doMapInfo(index) {
@@ -689,6 +688,7 @@ enterP1()
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p1");
       player thread pEnterP1(target);
     }
     
@@ -699,7 +699,6 @@ enterP1()
 pEnterP1(target)
 {
     self endon("disconnect");
-    self addTrigger("enter_p1");
 
     self thread pEnsurePart("p1");
     self freezecontrols(true);
@@ -811,6 +810,7 @@ enterP2()
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p2");
       player thread pEnterP2(target);
     }
 
@@ -821,7 +821,6 @@ enterP2()
 pEnterP2(target)
 {
     self endon("disconnect");
-    self addTrigger("enter_p2");
 
     self thread pEnsurePart("p2");
     self freezecontrols(true);
@@ -869,6 +868,7 @@ enterP3()
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p3");
       player thread pEnterP3(target);
     }
     wait 0.1;
@@ -878,7 +878,6 @@ enterP3()
 pEnterP3(target)
 {
   self endon("disconnect");
-  self addTrigger("enter_p3");
 
   self freezecontrols(true);
   self hudFadeBlack(1, false, 1);
@@ -906,6 +905,7 @@ enterP4A()
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p4_a");
       player thread pEnterP4A(target);
     }
     
@@ -916,7 +916,6 @@ enterP4A()
 pEnterP4A(target)
 {
     self endon("disconnect");
-    self addTrigger("enter_p4_a");
 
     model = spawn("script_origin",(0,0,0));
     model.origin = self.origin;
@@ -954,6 +953,7 @@ enterP4B()
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_p4_b");
       player thread pEnterP4B();
     }
     
@@ -964,10 +964,8 @@ enterP4B()
 pEnterP4B()
 {
   self endon("disconnect");
-  self addTrigger("enter_p4_b");
   
   self pEnsurePart("p4_b");
-
   model = spawn("script_origin", (0,0,0));
   model.origin = self.origin;
   self linkto(model);
@@ -1310,6 +1308,7 @@ enterFinish()
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_finish");
       player thread pEnterFinish(target);
     }
     wait 0.1;
@@ -1319,7 +1318,7 @@ enterFinish()
 pEnterFinish(target)
 {
   self endon("disconnect");
-  self addTrigger("enter_finish");
+
   orig = spawn ("script_origin",(0,0,0));
   orig.origin = self.origin;
   self linkto(orig);
@@ -1335,7 +1334,6 @@ pEnterFinish(target)
   orig delete();
   wait 3;
 
-  
   self setBusy(false);
 }
 
@@ -1371,6 +1369,7 @@ initEnterGallery()
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
+      player addTrigger("enter_gallery_tp");
       player thread pEnterGallery(target);
     }
     wait 0.1;
@@ -1379,7 +1378,6 @@ initEnterGallery()
 
 pEnterGallery(target) {
   self endon("disconnect");
-  self addTrigger("enter_gallery_tp");
   self thread pDoMusic("gallery");
   self hudFadeBlack(0.5, false, 1);
 
