@@ -21,7 +21,6 @@ main()
   thread initBeams();
   thread prepareWoofers();
   thread prepareFloors();
-  // wait 0.1;
   thread initMenu();
 }
 

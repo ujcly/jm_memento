@@ -3,7 +3,6 @@ Contains simplified functions implemented in JH mod to make the map playable loc
 */
 
 addTrigger(trig) {
->>>>>>> 390f347... f
   if(!isdefined(self.trigs))
     self.trigs = [];
   self.trigs[trig] = true;
