@@ -529,19 +529,19 @@ trigMapPartTeleport() {
 pTeleportToMapPart(part_name, target) {
   switch(part_name) {
     case "p1":
-      thread pEnterP1(target);
+      self thread pEnterP1(target);
       break;
     case "p2":
-      thread pEnterP2(target);
+      self thread pEnterP2(target);
       break;
     case "p3":
-      thread pEnterP3(target);
+      self thread pEnterP3(target);
       break;
     case "p4":
-      thread pEnterP4FromFinish(target);
+      self thread pEnterP4FromFinish(target);
       break;
     case "end":
-      thread pEnterGallery(target);
+      self thread pEnterGallery(target);
       break;
   }
 }
