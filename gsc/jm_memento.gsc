@@ -81,7 +81,6 @@ main(){
   // Finish
   initMapPartTeleports();
   thread initEnterGallery();
-  thread initTomis();
   thread initPotatoEnd();
 
   level.historyLoadFunc = ::onHistoryLoad;
@@ -319,30 +318,6 @@ initCod1() {
   }
 }
 
-initTomis() {
-  trig = getent("tomis", "targetname");
-  orig = getent(trig.target, "targetname");
-  while(1) {
-    trig waittill("trigger", player);
-    player tomisCountDown(trig, orig);
-    wait 0.1;
-  }
-
-}
-
-tomisCountDown(trig, orig) {
-  self endon("disconnect");
-
-  time = 5;
-  while(time > 0 && self istouching(trig)) {
-    wait 0.05;
-    time -= 0.05;
-  }
-  if(self istouching(trig)) {
-    orig playSound("tomis");
-    wait 29;
-  }
-}
 
 initMapInfo() {
   trigs = getentarray("trig_map_info", "targetname");

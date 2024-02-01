@@ -103,16 +103,14 @@ initFireflies()  {
 
 initDescendGate() {
   ents = getentarray("fx_descend_gate", "targetname");
-  for(i = 0; i < ents.size; i++)
-  {
+  for(i = 0; i < ents.size; i++) {
     playLoopedFx(level._effect["descend_gate"], 0.7, ents[i].origin, 0, anglesToForward(ents[i].angles), anglesToUp(ents[i].angles));
   }
 }
 
 initParticleYellow() {
   ring = getentarray("fx_particle_ring", "targetname");
-  for(i = 0; i < ring.size; i++)
-  {
+  for(i = 0; i < ring.size; i++) {
     playLoopedFx(level._effect["particle_yellow"], 0.3, ring[i].origin);
   }
 }
