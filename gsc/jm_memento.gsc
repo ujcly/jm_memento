@@ -520,7 +520,7 @@ trigMapPartTeleport() {
     self waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
-      player thread pTeleportToMapPart(self.script_noteworthy, target);
+      player pTeleportToMapPart(self.script_noteworthy, target);
     }
     wait 0.1;
   }
@@ -554,7 +554,7 @@ pEnterP4FromFinish(target) {
   self setplayerangles(target.angles);
   self freezecontrols(true);
   wait 1;
-  self thread pEnsurePart("p4_a");
+  self pEnsurePart("p4_a");
 
   self pShowEnterText(3);
 
@@ -700,7 +700,7 @@ pEnterP1(target)
 {
     self endon("disconnect");
 
-    self thread pEnsurePart("p1");
+    self pEnsurePart("p1");
     self freezecontrols(true);
     self hudFadeBlack(0.1, false, 1);
     wait 0.5;
@@ -822,7 +822,7 @@ pEnterP2(target)
 {
     self endon("disconnect");
 
-    self thread pEnsurePart("p2");
+    self pEnsurePart("p2");
     self freezecontrols(true);
     self hudFadeBlack(0.2, false, 1);
     wait 4;
@@ -882,7 +882,7 @@ pEnterP3(target)
   self freezecontrols(true);
   self hudFadeBlack(1, false, 1);
   wait 1;
-  self thread pEnsurePart("p3");
+  self pEnsurePart("p3");
   self thread pShowEnterText(2);
   wait 5.1;
 
@@ -934,7 +934,7 @@ pEnterP4A(target)
 
     self hudFadeRed(1.5, false, 0);
     wait 1;
-    self thread pEnsurePart("p4_a");
+    self pEnsurePart("p4_a");
 
     self pShowEnterText(3);
   
