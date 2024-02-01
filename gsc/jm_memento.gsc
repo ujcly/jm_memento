@@ -36,7 +36,6 @@ main(){
 
   initTeleports();
   initFadeTeleports();
-  initShowEnterText();
 
   thread enterP1();
   thread enterP2();
@@ -55,6 +54,7 @@ main(){
   initTrigNice();
   
   // P1
+  thread initShowEnterP1Text();
   thread initPotatoStart();
   thread initCod1();
   
@@ -485,7 +485,6 @@ initHideQuote() {
   }
 }
 
-
 hideQuote() {
   cover = getent(self.target, "targetname");
   quote = getent(cover.target, "targetname");
@@ -501,8 +500,6 @@ hideQuote() {
   cover delete();
   self delete();
 }
-
-
 
 initMapPartTeleports() {
   trigs = getentarray("finish_map_part_teleport", "targetname");
@@ -553,7 +550,7 @@ pEnterP4FromFinish(target) {
   wait 1;
   self pEnsurePart("p4_a");
 
-  self pShowEnterText(3);
+  self pShowEnterText(4);
 
   wait 2.4;
   self freezecontrols(false);
@@ -562,8 +559,7 @@ pEnterP4FromFinish(target) {
   self setBusy(false);
 }
 
-p2StopAmbient()
-{
+p2StopAmbient() {
   trig = getent("p2_stop_ambient", "targetname");
   trig_name = "p2_stop_ambient";
   while(1)
@@ -577,8 +573,7 @@ p2StopAmbient()
   }
 }
 
-initSnowStorm()
-{
+initSnowStorm() {
   speakers = getentarray("snow_storm", "targetname");
   for(i = 0; i < speakers.size; i++) {
     speakers[i] playloopsound("snow_storm");
@@ -590,15 +585,13 @@ initSnowStorm()
   }
 }
 
-initTeleports()
-{
+initTeleports() {
   teleports = getentarray("teleport_classic","targetname");
   for(i = 0; i < teleports.size; i++)
     teleports[i] thread classicTeleport(i);
 }
 
-classicTeleport(i)
-{
+classicTeleport(i) {
   entTarget = getent(self.target, "targetname");
   trig_name = "classic_tp_" + i;
   should_set_angles = self.script_noteworthy;
@@ -618,8 +611,7 @@ classicTeleport(i)
   }
 }
 
-initFadeTeleports()
-{
+initFadeTeleports() {
   teleporters = getentarray("teleport_fade", "targetname");
   for(i = 0; i < teleporters.size; i++)
   {
@@ -627,12 +619,10 @@ initFadeTeleports()
   }
 }
 
-fadeTeleport(i)
-{
+fadeTeleport(i) {
   target = getent(self.target, "targetname");
   trig_name = "fade_tp_" + i;
-  while(true)
-  {
+  while(true) {
     self waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
@@ -642,8 +632,7 @@ fadeTeleport(i)
   }
 }
 
-pFadeTeleport(target, i)
-{
+pFadeTeleport(target, i) {
   self endon("disconnect");
   self freezecontrols(true);	
   self hudFadeBlack(0.5, false, 1);
@@ -655,13 +644,11 @@ pFadeTeleport(target, i)
   self setBusy(false);
 }
 
-initToiletDoor()
-{
+initToiletDoor() {
   door = getent ("toilet_door","targetname");
   trig = getent ("toilet_doortrig","targetname");
   door_sound = getent ("door_sound","targetname");
-  while (1)
-  {
+  while (1) {
     trig waittill ("trigger");
     door rotateto ((0, 90,0), 1);
     door_sound playsound("castle_dooropen");
@@ -674,13 +661,11 @@ initToiletDoor()
   }
 }
 
-enterP1()
-{
+enterP1() {
   trig = getent("enter_p1", "targetname");
   target = getent(trig.target, "targetname");
 
-  while(true)
-  {
+  while(true) {
     trig waittill("trigger", player);
     if(!player isBusy()) {
       player setBusy(true);
@@ -692,8 +677,7 @@ enterP1()
   }
 }
 
-pEnterP1(target)
-{
+pEnterP1(target) {
     self endon("disconnect");
 
     self pEnsurePart("p1");
@@ -708,31 +692,19 @@ pEnterP1(target)
     self setBusy(false);
 }
 
-initShowEnterText()
-{
-  trigs = getentarray("show_enter_text", "targetname");
-  for(i = 0; i < trigs.size; i++)
-  {
-    trigs[i] thread trigShowEnterText();
-  }
-}
-
-trigShowEnterText()
-{
-  p_index = self.script_noteworthy;
-  trig_name = "show_text_"+p_index;
-  while(true)
-  {
-    self waittill("trigger", player);
+initShowEnterP1Text() {
+  trig = getent("show_enter_text", "targetname");
+  trig_name = "show_enter_text";
+  while(true) {
+    trig waittill("trigger", player);
     if(!player hasTrigger(trig_name)) {
-      player thread pShowEnterText(p_index);
       player addTrigger(trig_name);
+      player thread pShowEnterText(1);
     }
   }
 }
 
-pShowEnterText(part_index, x1, y1, x2, y2)
-{
+pShowEnterText(part_index, x1, y1, x2, y2) {
   // Displays text when entering a new part. Default placement is in the center of the screen.
   self endon("disconnect");
 
@@ -763,7 +735,7 @@ pShowEnterText(part_index, x1, y1, x2, y2)
 
   partentertext.alignX = "center";
   partentertext.alignY = "bottom";
-  partentertext settext(level.entertexts[part_index]);
+  partentertext settext(level.entertexts[part_index - 1]);
   partentertext.alpha = 0;
   partentertext fadeovertime(1);
   partentertext.alpha = 1;
@@ -780,7 +752,7 @@ pShowEnterText(part_index, x1, y1, x2, y2)
   partentertext2.fontscale = 1.15;
   partentertext2.alignX = "center";
   partentertext2.alignY = "bottom";
-  partentertext2 settext(level.entertexts2[part_index]);
+  partentertext2 settext(level.entertexts2[part_index - 1]);
   partentertext2.alpha = 0;
   partentertext2 fadeovertime(1.5);
   partentertext2.alpha = 1;
@@ -814,24 +786,23 @@ enterP2()
   }
 }
 
-pEnterP2(target)
-{
-    self endon("disconnect");
+pEnterP2(target) {
+  self endon("disconnect");
 
-    self pEnsurePart("p2");
-    self freezecontrols(true);
-    self hudFadeBlack(0.2, false, 1);
-    wait 4;
-    self thread pShowEnterText(1, undefined, undefined, 319);
-    wait 7;
+  self pEnsurePart("p2");
+  self freezecontrols(true);
+  self hudFadeBlack(0.2, false, 1);
+  wait 4;
+  self thread pShowEnterText(2, undefined, undefined, 319);
+  wait 7;
 
-    self setorigin(target.origin);
-    self setplayerangles(target.angles);
+  self setorigin(target.origin);
+  self setplayerangles(target.angles);
 
-    self freezecontrols(false);
-    self hudFadeBlack(4, true, 0);
-    
-    self setBusy(false);
+  self freezecontrols(false);
+  self hudFadeBlack(4, true, 0);
+
+  self setBusy(false);
 }
 
 initLeap() {
@@ -879,7 +850,7 @@ pEnterP3(target)
   self hudFadeBlack(1, false, 1);
   wait 1;
   self pEnsurePart("p3");
-  self thread pShowEnterText(2);
+  self thread pShowEnterText(3);
   wait 5.1;
 
   self setorigin(target.origin);
@@ -932,7 +903,7 @@ pEnterP4A(target)
     wait 1;
     self pEnsurePart("p4_a");
 
-    self pShowEnterText(3);
+    self pShowEnterText(4);
   
     wait 2.4;
     self freezecontrols(false);
